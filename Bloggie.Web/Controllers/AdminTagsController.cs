@@ -64,6 +64,48 @@ namespace Bloggie.Web.Controllers
 
             return View(null);
         }
+
+        [HttpPost]
+        public IActionResult Edit(EditTagRequest editTagRequest)
+        {
+            var tag = new Tag
+            {
+                Id = editTagRequest.Id,
+                Name = editTagRequest.Name,
+                DisplayName = editTagRequest.DisplayName,
+            };
+
+           var existingTag = _bloggieDbContext.Tags.Find(tag.Id);
+            if (existingTag != null)
+            {
+                existingTag.Name = tag.Name;
+                existingTag.DisplayName = tag.DisplayName;
+
+                //Save changes
+                _bloggieDbContext.SaveChanges();
+                //Show success notificiation
+                return RedirectToAction("Edit", new { id = editTagRequest.Id });
+            }
+
+            //Show error notification
+            return RedirectToAction("Edit", new { id = editTagRequest.Id });
+        }
+
+        [HttpPost]
+        public IActionResult Delete(EditTagRequest editTagRequest)
+        {
+            var existingTag = _bloggieDbContext.Tags.Find(editTagRequest.Id);
+            if (existingTag != null)
+            {
+                _bloggieDbContext.Tags.Remove(existingTag);
+                _bloggieDbContext.SaveChanges();
+                //Show success notificiation
+                return RedirectToAction("List");
+            }
+
+            //Show error notification
+            return RedirectToAction("Edit", new { id = editTagRequest.Id });
+        }
     }
 }
 
